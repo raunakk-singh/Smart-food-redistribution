@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { forwardRef, useEffect, useId, useRef, useState } from 'react'
 import searchLogo from './img/search.png'
 import githubLogo from './img/github (1).png'
 import gettyVideo from './img/gettyimages-451083741-640_adpp.mp4'
@@ -546,7 +546,275 @@ function AboutPage({ onBack, onJoin }) {
   )
 }
 
+const AboutSection = forwardRef(({ onDonate, onVolunteer }, ref) => (
+  <div ref={ref} className="bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
+    <section className="py-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <h2 className="text-4xl font-bold tracking-tight text-slate-900">How You Can Help Us</h2>
+        <p className="mt-4 max-w-3xl text-lg text-slate-600">
+          Our platform empowers communities by reducing food waste and supporting those in need. You can contribute in multiple ways.
+        </p>
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          {[
+            {
+              icon: '💰',
+              title: 'Join the Funding',
+              description: 'Support our mission by contributing a small monthly amount. Even the cost of one meal can help feed someone in need.',
+              label: 'Subscribe Now',
+            },
+            {
+              icon: '🍛',
+              title: 'Donate Food / Support Initiatives',
+              description: 'Help redistribute surplus food from restaurants to people in need and reduce food waste in your community.',
+              label: 'Donate Now',
+            },
+            {
+              icon: '⚡',
+              title: 'Support Sustainability',
+              description: 'Contribute to initiatives that promote sustainable solutions and community development.',
+              label: 'Contribute',
+            },
+            {
+              icon: '🤝',
+              title: 'Share Your Skills (Volunteer)',
+              description: 'Join as a volunteer and help deliver food or support the platform with your skills.',
+              label: 'Become a Volunteer',
+            },
+          ].map((card, index) => (
+            <article
+              key={card.title}
+              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              style={{ animation: `fadeInUp 0.55s ease ${index * 0.08}s both` }}
+            >
+              <div className="text-4xl">{card.icon}</div>
+              <h3 className="mt-4 text-xl font-semibold text-slate-900">{card.title}</h3>
+              <p className="mt-2 text-slate-600">{card.description}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (card.label === 'Become a Volunteer') {
+                    onVolunteer?.()
+                  } else {
+                    onDonate?.()
+                  }
+                }}
+                className="mt-5 inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-transform duration-150 hover:bg-emerald-500 active:scale-95"
+              >
+                {card.label}
+              </button>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section className="border-t border-slate-200 bg-white py-20">
+      <div className="mx-auto max-w-7xl px-6">
+        <h2 className="text-4xl font-bold tracking-tight text-slate-900">About Us</h2>
+        <p className="mt-5 max-w-3xl text-lg text-slate-600">
+          We connect restaurants, NGOs, and volunteers for smart food redistribution. Surplus food is quickly assigned to nearby partners and delivered to people in need.
+        </p>
+
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <h3 className="font-semibold text-slate-900">Mission</h3>
+            <p className="mt-2 text-slate-600">To reduce food waste and ensure surplus food reaches those in need.</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <h3 className="font-semibold text-slate-900">Vision</h3>
+            <p className="mt-2 text-slate-600">To build a sustainable, hunger-free community using technology.</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <h3 className="font-semibold text-slate-900">How it Works</h3>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 text-slate-600">
+              <li>Restaurants upload food</li>
+              <li>NGOs receive requests</li>
+              <li>Volunteers pickup and deliver</li>
+              <li>Food reaches people in need</li>
+            </ol>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <h3 className="font-semibold text-slate-900">Impact</h3>
+            <p className="mt-2 text-slate-600">Track meals saved, volunteers active, donations shared, and NGOs connected.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <style>{`
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes scalePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+    `}</style>
+  </div>
+))
+
+function VolunteerPage({ onBack }) {
+  const [counters] = useState({ deliveries: 115, tasks: 8, meals: 875 })
+  const [activeTask, setActiveTask] = useState(null)
+  const [candidateTasks, setCandidateTasks] = useState([
+    { id: 1, food: 'Mixed Veg Thali', quantity: '25 meals', restaurant: 'Green Spice', distance: '1.2 km', pickup: '14:30' },
+    { id: 2, food: 'Rice and Dal', quantity: '40 meals', restaurant: 'Urban Dine', distance: '2.1 km', pickup: '15:00' },
+    { id: 3, food: 'Fruit Boxes', quantity: '20 meals', restaurant: 'Fresh Farm', distance: '0.9 km', pickup: '15:40' },
+  ])
+  const [history, setHistory] = useState([])
+  const [notifications, setNotifications] = useState([
+    'New priority task near your location',
+    'Task completed by Reena, 20 min ago',
+  ])
+
+  const acceptTask = (task) => {
+    setActiveTask({ ...task, status: 'ready' })
+    setCandidateTasks((prev) => prev.filter((t) => t.id !== task.id))
+  }
+
+  const pickupTask = () => {
+    if (!activeTask) return
+    setActiveTask((task) => ({ ...task, status: 'picked' }))
+  }
+
+  const deliverTask = () => {
+    if (!activeTask) return
+    setHistory((prev) => [
+      ...prev,
+      { ...activeTask, status: 'delivered', date: new Date().toLocaleDateString() },
+    ])
+    setActiveTask(null)
+  }
+
+  const progress = activeTask?.status === 'picked' ? 80 : 40
+
+  return (
+    <div className="min-h-screen bg-[#F9FAFB] text-[#111827]">
+      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-2xl bg-[#16A34A]/20 text-[#16A34A] flex items-center justify-center font-bold">SF</div>
+            <div>
+              <h1 className="text-lg font-bold">Volunteer Dashboard</h1>
+              <p className="text-xs text-slate-500">Delivery-ready status active</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="rounded-full bg-white px-3 py-1 text-sm text-slate-700 shadow-sm hover:bg-slate-100">🔔 <span className="ml-1 rounded-full bg-orange-500 px-2 py-0.5 text-xs text-white">{notifications.length}</span></button>
+            <button className="rounded-full bg-[#16A34A] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#15803d]" onClick={onBack}>Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mb-8 grid gap-4 sm:grid-cols-1 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-lg">
+            <h3 className="text-sm font-semibold text-slate-500">Total Deliveries</h3>
+            <p className="mt-2 text-3xl font-bold text-[#16A34A]">{counters.deliveries}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-lg">
+            <h3 className="text-sm font-semibold text-slate-500">Active Tasks</h3>
+            <p className="mt-2 text-3xl font-bold text-[#F97316]">{counters.tasks}</p>
+          </div>
+          <div className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-lg">
+            <h3 className="text-sm font-semibold text-slate-500">Meals Delivered</h3>
+            <p className="mt-2 text-3xl font-bold text-[#16A34A]">{counters.meals}</p>
+          </div>
+        </div>
+
+        <section className="mb-8">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold">Available Tasks</h2>
+            <p className="text-sm text-slate-500">Swipe or tap to accept a task</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {candidateTasks.map((task) => (
+              <article key={task.id} className="rounded-2xl border border-transparent bg-white p-5 shadow-sm transition hover:shadow-xl hover:-translate-y-2 hover:border-gradient-to-r hover:border-[#16A34A]" style={{ borderImage: 'linear-gradient(90deg, #16A34A, #F97316) 1' }}>
+                <h3 className="text-lg font-semibold">{task.food}</h3>
+                <p className="text-xs text-slate-500">{task.restaurant} • {task.quantity}</p>
+                <p className="mt-2 text-sm text-slate-600">Distance: {task.distance}</p>
+                <p className="text-sm text-slate-600">Pickup: {task.pickup}</p>
+                <button className="mt-4 rounded-xl bg-[#F97316] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ea580c] active:scale-95" onClick={() => acceptTask(task)}>
+                  Accept Task
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {activeTask && (
+          <section className="mb-8 rounded-2xl bg-[#16A34A] bg-opacity-10 p-6 shadow-lg">
+            <h3 className="mb-2 text-xl font-bold text-[#065f46]">Active Task</h3>
+            <p className="text-sm text-slate-700">{activeTask.food} at {activeTask.restaurant}</p>
+            <p className="text-sm text-slate-700">NGO Delivery Location: {activeTask.restaurant} Community Center</p>
+            <p className="mt-2 text-sm text-slate-700">Contact: +91-9876543210</p>
+            <div className="mb-4 mt-4 h-2 rounded-full bg-slate-200">
+              <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-orange-500" style={{ width: `${progress}%`, transition: 'width 0.3s ease' }} />
+            </div>
+            <div className="flex gap-3">
+              <button className="rounded-lg bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#15803d]" onClick={pickupTask}>Mark as Picked Up</button>
+              <button className="rounded-lg bg-[#F97316] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ea580c]" onClick={deliverTask}>Mark as Delivered</button>
+            </div>
+          </section>
+        )}
+
+        <section className="mb-8 grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <h4 className="text-lg font-semibold">Map</h4>
+            <div className="mt-3 h-64 rounded-xl border border-slate-200 bg-slate-100">
+              <iframe
+                title="Volunteer route map"
+                src="https://www.google.com/maps/embed?pb=!1m18..."
+                className="h-full w-full rounded-xl"
+                loading="lazy"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <h4 className="text-lg font-semibold">Task History</h4>
+            <div className="mt-3 space-y-3">
+              {history.length === 0 ? (
+                <p className="text-sm text-slate-500">No completed tasks yet.</p>
+              ) : history.map((item, i) => (
+                <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700" style={{ animation: `fadeInUp 0.4s ease ${i * 0.1}s both` }}>
+                  <div className="font-semibold text-slate-900">{item.food}</div>
+                  <div>{item.date} • {item.status}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <h4 className="text-lg font-semibold">Gamification</h4>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-slate-200 bg-[#ecfdf5] p-4 text-center">
+              <div className="text-xl font-bold text-[#16A34A]">🥇</div>
+              <div className="font-semibold">Food Hero</div>
+              <div className="text-sm text-slate-700">1000 points</div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-[#ffedd5] p-4 text-center">
+              <div className="text-xl font-bold text-[#f97316]">🏅</div>
+              <div className="font-semibold">Top Volunteer</div>
+              <div className="text-sm text-slate-700">Trusted badge</div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-[#dbeafe] p-4 text-center">
+              <div className="text-xl font-bold text-[#2563eb]">🌟</div>
+              <div className="font-semibold">Leaderboard</div>
+              <div className="text-sm text-slate-700">#12 this month</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  )
+}
+
 export default function LandingPage() {
+
   const [page, setPage] = useState('landing')
   const heroVideoRef = useRef(null)
   const aboutRef = useRef(null)
@@ -633,6 +901,10 @@ export default function LandingPage() {
     return <DonatePage onBack={() => setPage('landing')} />
   }
 
+  if (page === 'volunteer') {
+    return <VolunteerPage onBack={() => setPage('landing')} />
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 text-slate-900">
       <header className="fixed inset-x-0 top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
@@ -640,7 +912,7 @@ export default function LandingPage() {
           <div className="text-lg font-semibold tracking-tight">
             <span className="text-slate-900">Ann</span>
             <span className="text-emerald-600">Seva</span>
-            <span className="text-slate-900">simple</span>
+            
           </div> 
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
             <button type="button" onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">
@@ -725,40 +997,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <section ref={aboutRef} className="bg-white py-20 text-slate-900">
-        <div className="mx-auto max-w-7xl px-6">
-          <h2 className="text-4xl font-bold tracking-tight text-slate-900">About Us</h2>
-          <p className="mt-5 max-w-3xl text-lg text-slate-600">
-            We connect restaurants, NGOs, and volunteers for smart food redistribution. Surplus food is quickly assigned to nearby partners and delivered to people in need.
-          </p>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h3 className="font-semibold text-slate-900">Mission</h3>
-              <p className="mt-2 text-slate-600">To reduce food waste and ensure surplus food reaches those in need.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h3 className="font-semibold text-slate-900">Vision</h3>
-              <p className="mt-2 text-slate-600">To build a sustainable, hunger-free community using technology.</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h3 className="font-semibold text-slate-900">How it Works</h3>
-              <ol className="mt-2 list-decimal space-y-1 pl-5 text-slate-600">
-                <li>Restaurants upload food</li>
-                <li>NGOs receive requests</li>
-                <li>Volunteers pickup and deliver</li>
-                <li>Food reaches people in need</li>
-              </ol>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h3 className="font-semibold text-slate-900">Impact</h3>
-              <p className="mt-2 text-slate-600">Track meals saved, volunteers active, donations shared, and NGOs connected.</p>
-            </div>
-          </div>
-
-          
-        </div>
-      </section>
+      <AboutSection ref={aboutRef} onDonate={goToDonate} onVolunteer={() => setPage('volunteer')} />
     </div>
   )
 }
