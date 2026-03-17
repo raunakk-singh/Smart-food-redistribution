@@ -1,225 +1,645 @@
-import { forwardRef, useEffect, useId, useRef, useState } from 'react'
-import searchLogo from './img/search.png'
-import githubLogo from './img/github (1).png'
-import gettyVideo from './img/gettyimages-451083741-640_adpp.mp4'
+import { forwardRef, useEffect, useId, useRef, useState } from "react";
+import searchLogo from "./img/search.png";
+import gettyVideo from "./img/gettyimages-451083741-640_adpp.mp4";
+import warmFood from "./img/warmFood.mp4";
 
 function LoginPage({ onBack, onLoginSuccess }) {
-  const [emailOrUsername, setEmailOrUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const emailOrUsernameId = useId()
-  const passwordId = useId()
+  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [authView, setAuthView] = useState("signin"); // "signin" | "signupRole" | "signupForm"
+  const [accountType, setAccountType] = useState(""); // "ngo" | "donor" | ""
+  const [signup, setSignup] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+    ngoName: "",
+    ngoRegistrationId: "",
+    organizationCity: "",
+  });
+  const emailOrUsernameId = useId();
+  const passwordId = useId();
+  const signupId = useId();
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     if (!emailOrUsername.trim() || !password.trim()) {
-      setError('Please enter your email/username and password.')
-      return
+      setError("Please enter your email/username and password.");
+      return;
     }
 
-    onLoginSuccess?.()
-  }
+    onLoginSuccess?.();
+  };
+
+  const handleSignupChange = (e) => {
+    const { name, value } = e.target;
+    setSignup((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetSignup = () => {
+    setAccountType("");
+    setSignup({
+      fullName: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+      ngoName: "",
+      ngoRegistrationId: "",
+      organizationCity: "",
+    });
+  };
+
+  const handleSignupSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!accountType) {
+      setError("Please choose NGO or Donor.");
+      return;
+    }
+
+    if (!signup.fullName.trim() || !signup.email.trim() || !signup.password.trim()) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (signup.password !== signup.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if (accountType === "ngo" && !signup.ngoName.trim()) {
+      setError("Please enter your NGO name.");
+      return;
+    }
+
+    // Demo-only: after "creating" account, send user back to sign in.
+    setError("Account created (demo). Please sign in.");
+    setAuthView("signin");
+    resetSignup();
+  };
 
   return (
-    <div className="relative min-h-screen overflow-hidden text-slate-900">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 h-full w-full object-cover"
-        src={gettyVideo}
-      />
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-4 py-16 sm:px-6 lg:flex-row lg:px-8">
-        <div className="mx-auto w-full max-w-md lg:mx-0 lg:flex-1">
-          <div className="space-y-6 rounded-3xl bg-white/85 p-10 shadow-xl ring-1 ring-slate-200 backdrop-blur-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome back</h1>
-                <p className="mt-2 text-sm text-slate-500">Enter your account details to sign in.</p>
-              </div>
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
+      <div className="grid min-h-screen w-full grid-cols-1 items-stretch gap-0 lg:grid-cols-[3fr_2fr]">
+        <div className="flex flex-col px-6 py-8 sm:px-10 lg:px-16 lg:py-10">
+          <div className="flex items-center justify-between">
+            <div className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              <span className="text-slate-900">Ann</span>
+              <span className="text-emerald-600">Seva</span>
+            </div>
+            {authView === "signin" ? (
               <button
                 type="button"
                 onClick={onBack}
-                className="text-sm font-medium text-slate-600 hover:text-slate-900"
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
               >
                 Back
               </button>
-            </div>
+            ) : null}
+          </div>
 
-            <div className="space-y-3">
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100"
-              >
-                <img src={searchLogo} alt="Google" className="h-5 w-5" />
-                Log in with Google
-              </button>
-              <button
-                type="button"
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100"
-              >
-                <img src={githubLogo} alt="GitHub" className="h-5 w-5" />
-                Log in with GitHub
-              </button>
-            </div>
+          <div className="flex flex-1 items-center py-10 lg:py-14">
+            <div className="mx-auto w-full max-w-md">
+              {authView === "signin" ? (
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+                      Welcome Back
+                    </h1>
+                    <p className="mt-3 text-base text-slate-500">
+                      Enter your email and password to access your account.
+                    </p>
+                  </div>
 
-            <div className="relative py-3">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase text-slate-500">
-                <span className="bg-white px-2 text-slate-600">or</span>
-              </div>
-            </div>
+                  <div className="space-y-3">
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base font-semibold text-slate-800 hover:bg-slate-100"
+                    >
+                      <img src={searchLogo} alt="Google" className="h-5 w-5" />
+                      Log in with Google
+                    </button>
+                  </div>
 
-            {error && (
-              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
-                {error}
-              </div>
-            )}
+                  <div className="relative py-3">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-slate-200" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase text-slate-500">
+                      <span className="bg-white px-2 text-slate-600">or</span>
+                    </div>
+                  </div>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor={emailOrUsernameId} className="text-xs font-semibold text-slate-700">
-                  Email or username
-                </label>
-                <input
-                  id={emailOrUsernameId}
-                  type="text"
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
-                  placeholder="you@example.com"
-                  value={emailOrUsername}
-                  onChange={(e) => setEmailOrUsername(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor={passwordId} className="text-xs font-semibold text-slate-700">
-                  Password
-                </label>
-                <input
-                  id={passwordId}
-                  type="password"
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+                  {error && (
+                    <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+                      {error}
+                    </div>
+                  )}
 
-              <div className="flex items-center justify-between text-sm text-slate-600">
-                <label className="inline-flex items-center gap-2">
-                  <input type="checkbox" className="h-4 w-4 rounded border-slate-300 bg-white text-cyan-600 focus:ring-cyan-500" />
-                  Keep me signed in
-                </label>
-                <button type="button" className="font-medium text-cyan-600 hover:text-cyan-500">
-                  Forgot password
-                </button>
-              </div>
+                  <form className="space-y-5" onSubmit={handleSubmit}>
+                    <div>
+                      <label
+                        htmlFor={emailOrUsernameId}
+                        className="text-sm font-semibold text-slate-700"
+                      >
+                        Email or username
+                      </label>
+                      <input
+                        id={emailOrUsernameId}
+                        type="text"
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                        placeholder="you@example.com"
+                        value={emailOrUsername}
+                        onChange={(e) => setEmailOrUsername(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor={passwordId}
+                        className="text-sm font-semibold text-slate-700"
+                      >
+                        Password
+                      </label>
+                      <input
+                        id={passwordId}
+                        type="password"
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                    </div>
 
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-cyan-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-cyan-500/30 hover:bg-cyan-500"
-              >
-                Sign in
-              </button>
-            </form>
+                    <div className="flex items-center justify-between text-sm text-slate-600">
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-slate-300 bg-white text-cyan-600 focus:ring-cyan-500"
+                        />
+                        Keep me signed in
+                      </label>
+                      <button
+                        type="button"
+                        className="font-medium text-cyan-600 hover:text-cyan-500"
+                      >
+                        Forgot password
+                      </button>
+                    </div>
 
-            <div className="text-center text-xs text-slate-500">
-              Don’t have an account?{' '}
-              <button type="button" className="font-medium text-cyan-600 hover:text-cyan-500">
-                Create an account
-              </button>
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-cyan-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm shadow-cyan-500/30 hover:bg-cyan-500"
+                    >
+                      Sign in
+                    </button>
+                  </form>
+
+                  <div className="text-center text-sm text-slate-500">
+                    Don’t have an account?{" "}
+                    <button
+                      type="button"
+                      className="font-medium text-cyan-600 hover:text-cyan-500"
+                      onClick={() => {
+                        setError("");
+                        resetSignup();
+                        setAuthView("signupRole");
+                      }}
+                    >
+                      Create an account
+                    </button>
+                  </div>
+                </div>
+              ) : authView === "signupRole" ? (
+                <div className="space-y-8">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+                        Create account
+                      </h1>
+                      <p className="mt-3 text-base text-slate-500">
+                        Choose the type of account you want to create.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+                      aria-label="Back to sign in"
+                      onClick={() => {
+                        setError("");
+                        resetSignup();
+                        setAuthView("signin");
+                      }}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M9 14l-4-4 4-4" />
+                        <path d="M5 10h10a4 4 0 0 1 4 4v5" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  <div className="grid gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setAccountType("ngo")}
+                      className={[
+                        "rounded-2xl border p-5 text-left transition",
+                        accountType === "ngo"
+                          ? "border-emerald-300 bg-emerald-50 ring-2 ring-emerald-200"
+                          : "border-slate-200 bg-white hover:bg-slate-50",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-lg font-semibold text-slate-900">
+                            Account for NGO
+                          </div>
+                          <div className="mt-1 text-sm text-slate-600">
+                            Manage requests, coordinate pickups, and track
+                            distribution.
+                          </div>
+                        </div>
+                        <div className="mt-1 h-5 w-5 rounded-full border border-slate-300 bg-white">
+                          {accountType === "ngo" ? (
+                            <div className="m-1 h-3 w-3 rounded-full bg-emerald-600" />
+                          ) : null}
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setAccountType("donor")}
+                      className={[
+                        "rounded-2xl border p-5 text-left transition",
+                        accountType === "donor"
+                          ? "border-cyan-300 bg-cyan-50 ring-2 ring-cyan-200"
+                          : "border-slate-200 bg-white hover:bg-slate-50",
+                      ].join(" ")}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-lg font-semibold text-slate-900">
+                            Account for Donor
+                          </div>
+                          <div className="mt-1 text-sm text-slate-600">
+                            Post surplus food and schedule pickups with nearby
+                            partners.
+                          </div>
+                        </div>
+                        <div className="mt-1 h-5 w-5 rounded-full border border-slate-300 bg-white">
+                          {accountType === "donor" ? (
+                            <div className="m-1 h-3 w-3 rounded-full bg-cyan-600" />
+                          ) : null}
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={!accountType}
+                    className={[
+                      "w-full rounded-xl px-4 py-3.5 text-base font-semibold shadow-sm transition",
+                      accountType
+                        ? "bg-slate-900 text-white hover:bg-slate-800"
+                        : "cursor-not-allowed bg-slate-200 text-slate-500",
+                    ].join(" ")}
+                    onClick={() => {
+                      if (!accountType) return;
+                      setError("");
+                      setAuthView("signupForm");
+                    }}
+                  >
+                    Continue
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h1 className="text-4xl font-bold tracking-tight text-slate-900">
+                        Sign up
+                      </h1>
+                      <p className="mt-3 text-base text-slate-500">
+                        Creating a{" "}
+                        <span className="font-semibold text-slate-700">
+                          {accountType === "ngo" ? "NGO" : "Donor"}
+                        </span>{" "}
+                        account.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50"
+                      aria-label="Back to account type"
+                      onClick={() => {
+                        setError("");
+                        setAuthView("signupRole");
+                      }}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M9 14l-4-4 4-4" />
+                        <path d="M5 10h10a4 4 0 0 1 4 4v5" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {error && (
+                    <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+                      {error}
+                    </div>
+                  )}
+
+                  <form className="space-y-5" onSubmit={handleSignupSubmit}>
+                    {accountType === "ngo" ? (
+                      <div>
+                        <label
+                          htmlFor={`${signupId}-ngoName`}
+                          className="text-sm font-semibold text-slate-700"
+                        >
+                          NGO name <span className="text-rose-600">*</span>
+                        </label>
+                        <input
+                          id={`${signupId}-ngoName`}
+                          name="ngoName"
+                          value={signup.ngoName}
+                          onChange={handleSignupChange}
+                          className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                          placeholder="e.g., Helping Hands Foundation"
+                        />
+                      </div>
+                    ) : null}
+
+                    <div>
+                      <label
+                        htmlFor={`${signupId}-fullName`}
+                        className="text-sm font-semibold text-slate-700"
+                      >
+                        Full name <span className="text-rose-600">*</span>
+                      </label>
+                      <input
+                        id={`${signupId}-fullName`}
+                        name="fullName"
+                        value={signup.fullName}
+                        onChange={handleSignupChange}
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                        placeholder="Your name"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor={`${signupId}-email`}
+                        className="text-sm font-semibold text-slate-700"
+                      >
+                        Email <span className="text-rose-600">*</span>
+                      </label>
+                      <input
+                        id={`${signupId}-email`}
+                        type="email"
+                        name="email"
+                        value={signup.email}
+                        onChange={handleSignupChange}
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                        placeholder="you@example.com"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor={`${signupId}-phone`}
+                        className="text-sm font-semibold text-slate-700"
+                      >
+                        Phone (optional)
+                      </label>
+                      <input
+                        id={`${signupId}-phone`}
+                        type="tel"
+                        name="phone"
+                        value={signup.phone}
+                        onChange={handleSignupChange}
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                        placeholder="+91 98765 43210"
+                      />
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label
+                          htmlFor={`${signupId}-password`}
+                          className="text-sm font-semibold text-slate-700"
+                        >
+                          Password <span className="text-rose-600">*</span>
+                        </label>
+                        <input
+                          id={`${signupId}-password`}
+                          type="password"
+                          name="password"
+                          value={signup.password}
+                          onChange={handleSignupChange}
+                          className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                          placeholder="••••••••"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor={`${signupId}-confirmPassword`}
+                          className="text-sm font-semibold text-slate-700"
+                        >
+                          Confirm <span className="text-rose-600">*</span>
+                        </label>
+                        <input
+                          id={`${signupId}-confirmPassword`}
+                          type="password"
+                          name="confirmPassword"
+                          value={signup.confirmPassword}
+                          onChange={handleSignupChange}
+                          className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
+                          placeholder="••••••••"
+                        />
+                      </div>
+                    </div>
+
+                    {accountType === "ngo" ? (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label
+                            htmlFor={`${signupId}-ngoRegistrationId`}
+                            className="text-sm font-semibold text-slate-700"
+                          >
+                            Registration ID (optional)
+                          </label>
+                          <input
+                            id={`${signupId}-ngoRegistrationId`}
+                            name="ngoRegistrationId"
+                            value={signup.ngoRegistrationId}
+                            onChange={handleSignupChange}
+                            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                            placeholder="NGO / Trust ID"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor={`${signupId}-organizationCity`}
+                            className="text-sm font-semibold text-slate-700"
+                          >
+                            City (optional)
+                          </label>
+                          <input
+                            id={`${signupId}-organizationCity`}
+                            name="organizationCity"
+                            value={signup.organizationCity}
+                            onChange={handleSignupChange}
+                            className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3.5 text-base text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                            placeholder="e.g., Mumbai"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <button
+                      type="submit"
+                      className="w-full rounded-xl bg-slate-900 px-4 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-slate-800"
+                    >
+                      Create account
+                    </button>
+                  </form>
+                </div>
+              )}
             </div>
           </div>
         </div>
-
-        <div className="hidden flex-1 items-center justify-center lg:flex">
-          <div className="h-[520px] w-[520px] rounded-3xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-30 blur-3xl" />
+        <div className="relative min-h-[42vh] overflow-hidden lg:min-h-screen">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover opacity-35 grayscale contrast-125"
+            src={warmFood}
+          />
+          <div className="absolute inset-0 bg-slate-900/35 mix-blend-multiply" />
+          <div className="relative flex h-full flex-col justify-between p-10 text-white lg:p-14">
+            <div className="space-y-2">
+              <div className="text-3xl font-semibold leading-tight">
+                Effortlessly manage donations and operations.
+              </div>
+              <div className="max-w-sm text-sm text-white/85">
+                Sign in to coordinate pickups, connect with NGOs, and track
+                impact across your community.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function DonatePage({ onBack }) {
   const [form, setForm] = useState({
-    foodName: '',
-    foodType: '',
-    isVeg: 'veg',
-    quantity: '',
-    mealsOrKg: '',
-    serves: '',
-    cookingTime: '',
-    expiryTime: '',
+    foodName: "",
+    foodType: "",
+    isVeg: "veg",
+    quantity: "",
+    mealsOrKg: "",
+    serves: "",
+    cookingTime: "",
+    expiryTime: "",
     conditionFresh: false,
     conditionPacked: false,
     conditionSafe: false,
-    address: '',
-    location: '',
+    address: "",
+    location: "",
     picture: null,
-    pickupWindow: '',
-    instructions: '',
-    name: '',
-    phone: '',
-  })
-  const [status, setStatus] = useState('')
-  const [impact, setImpact] = useState('')
-  const [mapUrl, setMapUrl] = useState('https://www.google.com/maps?q=India&z=5&output=embed')
+    pickupWindow: "",
+    instructions: "",
+    name: "",
+    phone: "",
+  });
+  const [status, setStatus] = useState("");
+  const [impact, setImpact] = useState("");
+  const [mapUrl, setMapUrl] = useState(
+    "https://www.google.com/maps?q=India&z=5&output=embed",
+  );
 
   const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target
-    if (type === 'checkbox') {
-      setForm((prev) => ({ ...prev, [name]: checked }))
-    } else if (name === 'picture') {
-      setForm((prev) => ({ ...prev, picture: files[0] || null }))
+    const { name, value, type, checked, files } = e.target;
+    if (type === "checkbox") {
+      setForm((prev) => ({ ...prev, [name]: checked }));
+    } else if (name === "picture") {
+      setForm((prev) => ({ ...prev, picture: files[0] || null }));
     } else {
-      setForm((prev) => ({ ...prev, [name]: value }))
-      if (name === 'location' && value.trim()) {
-        setMapUrl(`https://www.google.com/maps?q=${encodeURIComponent(value)}&z=15&output=embed`)
+      setForm((prev) => ({ ...prev, [name]: value }));
+      if (name === "location" && value.trim()) {
+        setMapUrl(
+          `https://www.google.com/maps?q=${encodeURIComponent(value)}&z=15&output=embed`,
+        );
       }
     }
-  }
+  };
 
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setStatus('Geolocation is not supported by your browser.')
-      return
+      setStatus("Geolocation is not supported by your browser.");
+      return;
     }
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const coords = `${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}`
+        const coords = `${position.coords.latitude.toFixed(6)},${position.coords.longitude.toFixed(6)}`;
         setForm((prev) => ({
           ...prev,
           location: coords,
-        }))
-        setMapUrl(`https://www.google.com/maps?q=${coords}&z=15&output=embed`)
-        setStatus('Current location loaded.')
+        }));
+        setMapUrl(`https://www.google.com/maps?q=${coords}&z=15&output=embed`);
+        setStatus("Current location loaded.");
       },
-      () => setStatus('Unable to retrieve your location.')
-    )
-  }
+      () => setStatus("Unable to retrieve your location."),
+    );
+  };
 
   const estimateImpact = () => {
-    const num = Number(form.quantity) || Number(form.mealsOrKg) || 0
-    const factor = form.isVeg === 'veg' ? 1.5 : 1.2
-    const serveCount = Math.max(1, Math.round(num * factor))
-    setImpact(`⭐ This quantity can serve around ${serveCount} people.`)
-  }
+    const num = Number(form.quantity) || Number(form.mealsOrKg) || 0;
+    const factor = form.isVeg === "veg" ? 1.5 : 1.2;
+    const serveCount = Math.max(1, Math.round(num * factor));
+    setImpact(`⭐ This quantity can serve around ${serveCount} people.`);
+  };
 
   const handlePost = (e) => {
-    e.preventDefault()
-    setStatus('✅ Donation posted successfully. Notifying nearby NGOs...')
-    estimateImpact()
-  }
+    e.preventDefault();
+    setStatus("✅ Donation posted successfully. Notifying nearby NGOs...");
+    estimateImpact();
+  };
 
   const handleDraft = (e) => {
-    e.preventDefault()
-    setStatus('Saved as draft. You can complete it later.')
-  }
+    e.preventDefault();
+    setStatus("Saved as draft. You can complete it later.");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-lime-50 to-pink-50 text-slate-900">
@@ -246,88 +666,207 @@ function DonatePage({ onBack }) {
           </div>
         )}
 
-        <form className="space-y-6 rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200" onSubmit={handlePost} noValidate>
+        <form
+          className="space-y-6 rounded-2xl bg-white p-6 shadow-lg ring-1 ring-slate-200"
+          onSubmit={handlePost}
+          noValidate
+        >
           <section className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <h3 className="mb-3 text-xl font-semibold text-slate-800">1. Basic Food Details</h3>
-            <p className="mb-4 text-sm text-slate-600">Provide accurate information to help NGO partners assess pickup and distribution requirements.</p>
+            <h3 className="mb-3 text-xl font-semibold text-slate-800">
+              1. Basic Food Details
+            </h3>
+            <p className="mb-4 text-sm text-slate-600">
+              Provide accurate information to help NGO partners assess pickup
+              and distribution requirements.
+            </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1 text-sm">
                 <span className="font-medium text-slate-700">Food Name</span>
-                <input name="foodName" value={form.foodName} onChange={handleChange} required className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100" placeholder="Rice, Dal, Biryani" />
+                <input
+                  name="foodName"
+                  value={form.foodName}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                  placeholder="Rice, Dal, Biryani"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Food Type
-                <input name="foodType" value={form.foodType} onChange={handleChange} required className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Full meal, side, etc." />
+                <input
+                  name="foodType"
+                  value={form.foodType}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="Full meal, side, etc."
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Veg / Non-Veg
-                <select name="isVeg" value={form.isVeg} onChange={handleChange} className="w-full rounded-lg border border-slate-300 px-3 py-2">
+                <select
+                  name="isVeg"
+                  value={form.isVeg}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                >
                   <option value="veg">Veg</option>
                   <option value="nonveg">Non-Veg</option>
                 </select>
               </label>
               <label className="space-y-1 text-sm">
                 Quantity
-                <input name="quantity" value={form.quantity} onChange={handleChange} type="number" min="1" required className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="e.g., 10" />
+                <input
+                  name="quantity"
+                  value={form.quantity}
+                  onChange={handleChange}
+                  type="number"
+                  min="1"
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="e.g., 10"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Number of meals / kg
-                <input name="mealsOrKg" value={form.mealsOrKg} onChange={handleChange} type="number" min="1" className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="e.g., 50" />
+                <input
+                  name="mealsOrKg"
+                  value={form.mealsOrKg}
+                  onChange={handleChange}
+                  type="number"
+                  min="1"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="e.g., 50"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Number of people it can serve (optional)
-                <input name="serves" value={form.serves} onChange={handleChange} type="number" min="1" className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="e.g., 30" />
+                <input
+                  name="serves"
+                  value={form.serves}
+                  onChange={handleChange}
+                  type="number"
+                  min="1"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="e.g., 30"
+                />
               </label>
             </div>
           </section>
 
           <section>
-            <h3 className="mb-3 text-lg font-semibold">⏰ 2. Food Safety Details</h3>
+            <h3 className="mb-3 text-lg font-semibold">
+              ⏰ 2. Food Safety Details
+            </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1 text-sm">
                 Cooking Time
-                <input name="cookingTime" value={form.cookingTime} onChange={handleChange} required type="datetime-local" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
+                <input
+                  name="cookingTime"
+                  value={form.cookingTime}
+                  onChange={handleChange}
+                  required
+                  type="datetime-local"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Expiry Time / Best Before
-                <input name="expiryTime" value={form.expiryTime} onChange={handleChange} required type="datetime-local" className="w-full rounded-lg border border-slate-300 px-3 py-2" />
+                <input
+                  name="expiryTime"
+                  value={form.expiryTime}
+                  onChange={handleChange}
+                  required
+                  type="datetime-local"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
               </label>
             </div>
             <div className="mt-3 space-y-1 text-sm">
-              <span className="font-medium text-slate-700">Food Condition Checklist</span>
-              <p className="text-xs text-slate-500">Select all applicable conditions.</p>
+              <span className="font-medium text-slate-700">
+                Food Condition Checklist
+              </span>
+              <p className="text-xs text-slate-500">
+                Select all applicable conditions.
+              </p>
               <label className="inline-flex items-center gap-2">
-                <input name="conditionFresh" checked={form.conditionFresh} onChange={handleChange} type="checkbox" className="h-4 w-4 rounded border-slate-300 focus:ring-2 focus:ring-cyan-100" />
+                <input
+                  name="conditionFresh"
+                  checked={form.conditionFresh}
+                  onChange={handleChange}
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-slate-300 focus:ring-2 focus:ring-cyan-100"
+                />
                 Fresh
               </label>
               <label className="inline-flex items-center gap-2">
-                <input name="conditionPacked" checked={form.conditionPacked} onChange={handleChange} type="checkbox" className="h-4 w-4 rounded border-slate-300" />
+                <input
+                  name="conditionPacked"
+                  checked={form.conditionPacked}
+                  onChange={handleChange}
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-slate-300"
+                />
                 Packed properly
               </label>
               <label className="inline-flex items-center gap-2">
-                <input name="conditionSafe" checked={form.conditionSafe} onChange={handleChange} type="checkbox" className="h-4 w-4 rounded border-slate-300" />
+                <input
+                  name="conditionSafe"
+                  checked={form.conditionSafe}
+                  onChange={handleChange}
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-slate-300"
+                />
                 Safe to consume
               </label>
             </div>
           </section>
 
           <section className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <h3 className="mb-3 text-xl font-semibold text-slate-800">3. Location Details</h3>
-            <p className="text-sm text-slate-600">Use precise address and live coordinates for better logistic execution.</p>
+            <h3 className="mb-3 text-xl font-semibold text-slate-800">
+              3. Location Details
+            </h3>
+            <p className="text-sm text-slate-600">
+              Use precise address and live coordinates for better logistic
+              execution.
+            </p>
             <div className="grid gap-4 sm:grid-cols-1">
               <label className="space-y-1 text-sm">
-                <span className="font-medium text-slate-700">Pickup Address (auto-fill or manual)</span>
-                <input name="address" value={form.address} onChange={handleChange} required className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100" placeholder="123, Mumbai" />
+                <span className="font-medium text-slate-700">
+                  Pickup Address (auto-fill or manual)
+                </span>
+                <input
+                  name="address"
+                  value={form.address}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100"
+                  placeholder="123, Mumbai"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Live Location (Google Maps integration)
-                <input name="location" value={form.location} onChange={handleChange} className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Latitude, Longitude" />
+                <input
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="Latitude, Longitude"
+                />
               </label>
-              <button type="button" onClick={useCurrentLocation} className="rounded-lg bg-cyan-600 px-4 py-2 text-white hover:bg-cyan-500">Use Current Location</button>
+              <button
+                type="button"
+                onClick={useCurrentLocation}
+                className="rounded-lg bg-cyan-600 px-4 py-2 text-white hover:bg-cyan-500"
+              >
+                Use Current Location
+              </button>
             </div>
 
             <div className="mt-4 rounded-lg border border-slate-200 shadow-inner">
-              <h4 className="px-3 py-2 text-sm font-medium text-slate-600">Map preview</h4>
+              <h4 className="px-3 py-2 text-sm font-medium text-slate-600">
+                Map preview
+              </h4>
               <div className="h-64 w-full overflow-hidden rounded-b-lg">
                 <iframe
                   title="Google Map Preview"
@@ -342,8 +881,16 @@ function DonatePage({ onBack }) {
 
           <section>
             <h3 className="mb-3 text-lg font-semibold">📸 4. Upload Image</h3>
-            <input name="picture" type="file" accept="image/*" onChange={handleChange} className="text-sm" />
-            <p className="mt-1 text-sm text-slate-500">Upload food image (for verification helps NGO trust quality)</p>
+            <input
+              name="picture"
+              type="file"
+              accept="image/*"
+              onChange={handleChange}
+              className="text-sm"
+            />
+            <p className="mt-1 text-sm text-slate-500">
+              Upload food image (for verification helps NGO trust quality)
+            </p>
           </section>
 
           <section>
@@ -351,11 +898,23 @@ function DonatePage({ onBack }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1 text-sm">
                 Pickup Time Window
-                <input name="pickupWindow" value={form.pickupWindow} onChange={handleChange} className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="6 PM – 8 PM" />
+                <input
+                  name="pickupWindow"
+                  value={form.pickupWindow}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="6 PM – 8 PM"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Special Instructions
-                <input name="instructions" value={form.instructions} onChange={handleChange} className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Call before arrival / Enter from back gate" />
+                <input
+                  name="instructions"
+                  value={form.instructions}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="Call before arrival / Enter from back gate"
+                />
               </label>
             </div>
           </section>
@@ -365,25 +924,54 @@ function DonatePage({ onBack }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="space-y-1 text-sm">
                 Name
-                <input name="name" value={form.name} onChange={handleChange} required className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="Your Name" />
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="Your Name"
+                />
               </label>
               <label className="space-y-1 text-sm">
                 Phone Number
-                <input name="phone" value={form.phone} onChange={handleChange} required type="tel" className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="+91 98765 43210" />
+                <input
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  required
+                  type="tel"
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder="+91 98765 43210"
+                />
               </label>
             </div>
           </section>
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
-            <button type="submit" className="rounded-full bg-emerald-600 px-6 py-2 text-sm font-semibold text-white shadow-md hover:bg-emerald-500">Post Donation</button>
-            <button type="button" onClick={handleDraft} className="rounded-full border border-slate-300 px-6 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Save as Draft</button>
+            <button
+              type="submit"
+              className="rounded-full bg-emerald-600 px-6 py-2 text-sm font-semibold text-white shadow-md hover:bg-emerald-500"
+            >
+              Post Donation
+            </button>
+            <button
+              type="button"
+              onClick={handleDraft}
+              className="rounded-full border border-slate-300 px-6 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              Save as Draft
+            </button>
           </div>
 
-          <div className="text-sm text-slate-500">⭐ Bonus: {impact || 'Fill form to get AI suggestion and impact preview.'}</div>
+          <div className="text-sm text-slate-500">
+            ⭐ Bonus:{" "}
+            {impact || "Fill form to get AI suggestion and impact preview."}
+          </div>
         </form>
       </div>
     </div>
-  )
+  );
 }
 
 function AboutPage({ onBack, onJoin }) {
@@ -391,8 +979,11 @@ function AboutPage({ onBack, onJoin }) {
     <div className="min-h-screen bg-white text-slate-900">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="text-lg font-bold text-emerald-700">Smart Food Redistribution</div>
+          <div className="text-lg font-bold text-emerald-700">
+            Smart Food Redistribution
+          </div>
           <button
+            type="button"
             onClick={onBack}
             className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
           >
@@ -408,9 +999,11 @@ function AboutPage({ onBack, onJoin }) {
               Reducing Food Waste, Feeding Lives
             </h1>
             <p className="mt-6 max-w-xl text-lg text-slate-600">
-              Connecting restaurants, NGOs, and volunteers to redistribute surplus food efficiently.
+              Connecting restaurants, NGOs, and volunteers to redistribute
+              surplus food efficiently.
             </p>
             <button
+              type="button"
               onClick={onJoin}
               className="mt-8 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-500"
             >
@@ -419,7 +1012,9 @@ function AboutPage({ onBack, onJoin }) {
           </div>
           <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex h-64 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 via-white to-cyan-100">
-              <span className="text-xl font-semibold text-slate-600">🤝 Community donation illustration</span>
+              <span className="text-xl font-semibold text-slate-600">
+                🤝 Community donation illustration
+              </span>
             </div>
           </div>
         </div>
@@ -427,27 +1022,41 @@ function AboutPage({ onBack, onJoin }) {
 
       <section className="border-t border-slate-100 bg-slate-50 py-16">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-2xl font-bold text-slate-900">About the Platform</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            About the Platform
+          </h2>
           <p className="mt-4 max-w-3xl text-slate-600">
-            We empower food donors, NGOs, and volunteers to coordinate in real-time, ensuring surplus meals are diverted from waste to relief.
+            We empower food donors, NGOs, and volunteers to coordinate in
+            real-time, ensuring surplus meals are diverted from waste to relief.
           </p>
           <p className="mt-3 max-w-3xl text-slate-600">
-            Donors share available food, NGOs schedule pickups, and volunteers complete deliveries, creating a seamless redistribution chain.
+            Donors share available food, NGOs schedule pickups, and volunteers
+            complete deliveries, creating a seamless redistribution chain.
           </p>
         </div>
       </section>
 
       <section className="py-16">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="text-2xl font-bold text-slate-900">Mission & Vision</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Mission & Vision
+          </h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
-              <h3 className="text-xl font-semibold text-emerald-700">Mission</h3>
-              <p className="mt-2 text-slate-700">To reduce food waste and ensure that surplus food reaches those in need.</p>
+              <h3 className="text-xl font-semibold text-emerald-700">
+                Mission
+              </h3>
+              <p className="mt-2 text-slate-700">
+                To reduce food waste and ensure that surplus food reaches those
+                in need.
+              </p>
             </div>
             <div className="rounded-2xl border border-cyan-100 bg-cyan-50 p-6">
               <h3 className="text-xl font-semibold text-cyan-700">Vision</h3>
-              <p className="mt-2 text-slate-700">To build a sustainable and hunger-free community using technology.</p>
+              <p className="mt-2 text-slate-700">
+                To build a sustainable and hunger-free community using
+                technology.
+              </p>
             </div>
           </div>
         </div>
@@ -505,10 +1114,18 @@ function AboutPage({ onBack, onJoin }) {
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-2xl font-bold text-slate-900">Why Choose Us</h2>
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            <li className="rounded-lg bg-white p-4 shadow-sm">Real-time food redistribution</li>
-            <li className="rounded-lg bg-white p-4 shadow-sm">Easy-to-use platform</li>
-            <li className="rounded-lg bg-white p-4 shadow-sm">Social impact driven</li>
-            <li className="rounded-lg bg-white p-4 shadow-sm">Scalable and efficient system</li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">
+              Real-time food redistribution
+            </li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">
+              Easy-to-use platform
+            </li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">
+              Social impact driven
+            </li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">
+              Scalable and efficient system
+            </li>
           </ul>
         </div>
       </section>
@@ -517,11 +1134,25 @@ function AboutPage({ onBack, onJoin }) {
         <div className="mx-auto max-w-6xl px-6">
           <h2 className="text-2xl font-bold text-slate-900">Meet the Team</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {['Aanya - Founder', 'Rohan - CTO', 'Mira - Ops Lead', 'Arjun - Community'].map((member) => (
-              <div key={member} className="rounded-xl border border-slate-200 bg-white p-4 text-center">
-                <div className="mx-auto mb-3 h-16 w-16 rounded-full bg-emerald-100 text-2xl leading-[64px]">👤</div>
-                <p className="font-semibold text-slate-800">{member.split(' - ')[0]}</p>
-                <p className="text-sm text-slate-500">{member.split(' - ')[1]}</p>
+            {[
+              "Aanya - Founder",
+              "Rohan - CTO",
+              "Mira - Ops Lead",
+              "Arjun - Community",
+            ].map((member) => (
+              <div
+                key={member}
+                className="rounded-xl border border-slate-200 bg-white p-4 text-center"
+              >
+                <div className="mx-auto mb-3 h-16 w-16 rounded-full bg-emerald-100 text-2xl leading-[64px]">
+                  👤
+                </div>
+                <p className="font-semibold text-slate-800">
+                  {member.split(" - ")[0]}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {member.split(" - ")[1]}
+                </p>
               </div>
             ))}
           </div>
@@ -535,48 +1166,81 @@ function AboutPage({ onBack, onJoin }) {
             <p>support@smartfoodredistribution.org | +91 98765 43210</p>
           </div>
           <div className="flex items-center gap-3">
-            <a href="#" className="text-slate-700 hover:text-emerald-600">Twitter</a>
-            <a href="#" className="text-slate-700 hover:text-emerald-600">LinkedIn</a>
-            <a href="#" className="text-slate-700 hover:text-emerald-600">Instagram</a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-700 hover:text-emerald-600"
+            >
+              Twitter
+            </a>
+            <a
+              href="https://www.linkedin.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-700 hover:text-emerald-600"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://www.instagram.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-slate-700 hover:text-emerald-600"
+            >
+              Instagram
+            </a>
           </div>
-          <div>&copy; {new Date().getFullYear()} Smart Food Redistribution. All rights reserved.</div>
+          <div>
+            &copy; {new Date().getFullYear()} Smart Food Redistribution. All
+            rights reserved.
+          </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
 
 const AboutSection = forwardRef(({ onDonate, onPartnerNGO }, ref) => (
-  <div ref={ref} className="bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
+  <div
+    ref={ref}
+    className="bg-gradient-to-b from-white via-slate-50 to-white text-slate-900"
+  >
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-6">
-        <h2 className="text-4xl font-bold tracking-tight text-slate-900">How You Can Help Us</h2>
+        <h2 className="text-4xl font-bold tracking-tight text-slate-900">
+          How You Can Help Us
+        </h2>
         <p className="mt-4 max-w-3xl text-lg text-slate-600">
-          Our platform empowers communities by reducing food waste and supporting those in need. You can contribute in multiple ways.
+          Our platform empowers communities by reducing food waste and
+          supporting those in need. You can contribute in multiple ways.
         </p>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {[
             {
-              icon: '💰',
-              title: 'Support the Cause',
-              description: 'Contribute to reducing food waste and helping communities by supporting our mission.',
-              label: 'Support Now',
-              action: 'donate',
+              icon: "💰",
+              title: "Support the Cause",
+              description:
+                "Contribute to reducing food waste and helping communities by supporting our mission.",
+              label: "Support Now",
+              action: "donate",
             },
             {
-              icon: '🍛',
-              title: 'Donate Food',
-              description: 'Restaurants and individuals can donate surplus food to ensure it reaches those in need.',
-              label: 'Donate Now',
-              action: 'donate',
+              icon: "🍛",
+              title: "Donate Food",
+              description:
+                "Restaurants and individuals can donate surplus food to ensure it reaches those in need.",
+              label: "Donate Now",
+              action: "donate",
             },
             {
-              icon: '🤝',
-              title: 'Partner as NGO',
-              description: 'Join as an NGO to collect, manage, and distribute food efficiently using our platform.',
-              label: 'Join as NGO',
-              action: 'ngo',
+              icon: "🤝",
+              title: "Partner as NGO",
+              description:
+                "Join as an NGO to collect, manage, and distribute food efficiently using our platform.",
+              label: "Join as NGO",
+              action: "ngo",
             },
           ].map((card, index) => (
             <article
@@ -585,15 +1249,17 @@ const AboutSection = forwardRef(({ onDonate, onPartnerNGO }, ref) => (
               style={{ animation: `fadeInUp 0.55s ease ${index * 0.08}s both` }}
             >
               <div className="text-4xl">{card.icon}</div>
-              <h3 className="mt-4 text-xl font-semibold text-slate-900">{card.title}</h3>
+              <h3 className="mt-4 text-xl font-semibold text-slate-900">
+                {card.title}
+              </h3>
               <p className="mt-2 text-slate-600">{card.description}</p>
               <button
                 type="button"
                 onClick={() => {
-                  if (card.action === 'ngo') {
-                    onPartnerNGO?.()
+                  if (card.action === "ngo") {
+                    onPartnerNGO?.();
                   } else {
-                    onDonate?.()
+                    onDonate?.();
                   }
                 }}
                 className="mt-5 inline-flex items-center rounded-full bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white transition-transform duration-150 hover:bg-[#15803d] active:scale-95"
@@ -608,19 +1274,28 @@ const AboutSection = forwardRef(({ onDonate, onPartnerNGO }, ref) => (
 
     <section className="border-t border-slate-200 bg-white py-20">
       <div className="mx-auto max-w-7xl px-6">
-        <h2 className="text-4xl font-bold tracking-tight text-slate-900">About Us</h2>
+        <h2 className="text-4xl font-bold tracking-tight text-slate-900">
+          About Us
+        </h2>
         <p className="mt-5 max-w-3xl text-lg text-slate-600">
-          We connect restaurants, NGOs, and volunteers for smart food redistribution. Surplus food is quickly assigned to nearby partners and delivered to people in need.
+          We connect restaurants, NGOs, and volunteers for smart food
+          redistribution. Surplus food is quickly assigned to nearby partners
+          and delivered to people in need.
         </p>
 
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <h3 className="font-semibold text-slate-900">Mission</h3>
-            <p className="mt-2 text-slate-600">To reduce food waste and ensure surplus food reaches those in need.</p>
+            <p className="mt-2 text-slate-600">
+              To reduce food waste and ensure surplus food reaches those in
+              need.
+            </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <h3 className="font-semibold text-slate-900">Vision</h3>
-            <p className="mt-2 text-slate-600">To build a sustainable, hunger-free community using technology.</p>
+            <p className="mt-2 text-slate-600">
+              To build a sustainable, hunger-free community using technology.
+            </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <h3 className="font-semibold text-slate-900">How it Works</h3>
@@ -633,7 +1308,10 @@ const AboutSection = forwardRef(({ onDonate, onPartnerNGO }, ref) => (
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <h3 className="font-semibold text-slate-900">Impact</h3>
-            <p className="mt-2 text-slate-600">Track meals saved, volunteers active, donations shared, and NGOs connected.</p>
+            <p className="mt-2 text-slate-600">
+              Track meals saved, volunteers active, donations shared, and NGOs
+              connected.
+            </p>
           </div>
         </div>
       </div>
@@ -650,65 +1328,115 @@ const AboutSection = forwardRef(({ onDonate, onPartnerNGO }, ref) => (
       }
     `}</style>
   </div>
-))
+));
 
 function NGODashboard({ onBack }) {
-  const [counters] = useState({ deliveries: 115, tasks: 8, meals: 875 })
-  const [activeTask, setActiveTask] = useState(null)
+  const [counters] = useState({ deliveries: 115, tasks: 8, meals: 875 });
+  const [activeTask, setActiveTask] = useState(null);
   const [candidateTasks, setCandidateTasks] = useState([
-    { id: 1, food: 'Mixed Veg Thali', quantity: '25 meals', restaurant: 'Green Spice', distance: '1.2 km', pickup: '14:30' },
-    { id: 2, food: 'Rice and Dal', quantity: '40 meals', restaurant: 'Urban Dine', distance: '2.1 km', pickup: '15:00' },
-    { id: 3, food: 'Fruit Boxes', quantity: '20 meals', restaurant: 'Fresh Farm', distance: '0.9 km', pickup: '15:40' },
-  ])
-  const [history, setHistory] = useState([])
+    {
+      id: 1,
+      food: "Mixed Veg Thali",
+      quantity: "25 meals",
+      restaurant: "Green Spice",
+      distance: "1.2 km",
+      pickup: "14:30",
+    },
+    {
+      id: 2,
+      food: "Rice and Dal",
+      quantity: "40 meals",
+      restaurant: "Urban Dine",
+      distance: "2.1 km",
+      pickup: "15:00",
+    },
+    {
+      id: 3,
+      food: "Fruit Boxes",
+      quantity: "20 meals",
+      restaurant: "Fresh Farm",
+      distance: "0.9 km",
+      pickup: "15:40",
+    },
+  ]);
+  const [history, setHistory] = useState([]);
   const [notifications, setNotifications] = useState([
-    'New priority task near your location',
-    'Task completed by Reena, 20 min ago',
-  ])
-  const [volunteer, setVolunteer] = useState({ name: '', phone: '', notes: '' })
+    "New priority task near your location",
+    "Task completed by Reena, 20 min ago",
+  ]);
+  const [volunteer, setVolunteer] = useState({
+    name: "",
+    phone: "",
+    notes: "",
+  });
 
   const acceptTask = (task) => {
-    setActiveTask({ ...task, status: 'ready' })
-    setCandidateTasks((prev) => prev.filter((t) => t.id !== task.id))
-  }
+    setActiveTask({ ...task, status: "ready" });
+    setCandidateTasks((prev) => prev.filter((t) => t.id !== task.id));
+  };
 
   const assignVolunteer = () => {
-    if (!activeTask) return
-    setActiveTask((task) => ({ ...task, assignedVolunteer: volunteer }))
-    setNotifications((prev) => [...prev, `Volunteer ${volunteer.name} assigned to task ${activeTask?.id}`])
-    setVolunteer({ name: '', phone: '', notes: '' })
-  }
+    if (!activeTask) return;
+    setActiveTask((task) => ({ ...task, assignedVolunteer: volunteer }));
+    setNotifications((prev) => [
+      ...prev,
+      `Volunteer ${volunteer.name} assigned to task ${activeTask?.id}`,
+    ]);
+    setVolunteer({ name: "", phone: "", notes: "" });
+  };
 
   const pickupTask = () => {
-    if (!activeTask) return
-    setActiveTask((task) => ({ ...task, status: 'picked' }))
-  }
+    if (!activeTask) return;
+    setActiveTask((task) => ({ ...task, status: "picked" }));
+  };
 
   const deliverTask = () => {
-    if (!activeTask) return
+    if (!activeTask) return;
     setHistory((prev) => [
       ...prev,
-      { ...activeTask, status: 'delivered', date: new Date().toLocaleDateString() },
-    ])
-    setActiveTask(null)
-  }
+      {
+        ...activeTask,
+        status: "delivered",
+        date: new Date().toLocaleDateString(),
+      },
+    ]);
+    setActiveTask(null);
+  };
 
-  const progress = activeTask?.status === 'picked' ? 80 : 40
+  const progress = activeTask?.status === "picked" ? 80 : 40;
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] text-[#111827]">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-lg">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-2xl bg-[#16A34A]/20 text-[#16A34A] flex items-center justify-center font-bold">NGO</div>
+            <div className="h-9 w-9 rounded-2xl bg-[#16A34A]/20 text-[#16A34A] flex items-center justify-center font-bold">
+              NGO
+            </div>
             <div>
               <h1 className="text-lg font-bold">NGO Delivery Dashboard</h1>
-              <p className="text-xs text-slate-500">Manage requests, assign volunteers, and track deliveries</p>
+              <p className="text-xs text-slate-500">
+                Manage requests, assign volunteers, and track deliveries
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="rounded-full bg-white px-3 py-1 text-sm text-slate-700 shadow-sm hover:bg-slate-100">🔔 <span className="ml-1 rounded-full bg-orange-500 px-2 py-0.5 text-xs text-white">{notifications.length}</span></button>
-            <button className="rounded-full bg-[#16A34A] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#15803d]" onClick={onBack}>Logout</button>
+            <button
+              type="button"
+              className="rounded-full bg-white px-3 py-1 text-sm text-slate-700 shadow-sm hover:bg-slate-100"
+            >
+              🔔{" "}
+              <span className="ml-1 rounded-full bg-orange-500 px-2 py-0.5 text-xs text-white">
+                {notifications.length}
+              </span>
+            </button>
+            <button
+              type="button"
+              className="rounded-full bg-[#16A34A] px-4 py-1.5 text-sm font-semibold text-white hover:bg-[#15803d]"
+              onClick={onBack}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </header>
@@ -716,32 +1444,60 @@ function NGODashboard({ onBack }) {
       <main className="mx-auto max-w-7xl px-6 py-8">
         <div className="mb-8 grid gap-4 sm:grid-cols-1 md:grid-cols-3">
           <div className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-lg">
-            <h3 className="text-sm font-semibold text-slate-500">Total Deliveries</h3>
-            <p className="mt-2 text-3xl font-bold text-[#16A34A]">{counters.deliveries}</p>
+            <h3 className="text-sm font-semibold text-slate-500">
+              Total Deliveries
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-[#16A34A]">
+              {counters.deliveries}
+            </p>
           </div>
           <div className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-lg">
-            <h3 className="text-sm font-semibold text-slate-500">Active Tasks</h3>
-            <p className="mt-2 text-3xl font-bold text-[#F97316]">{counters.tasks}</p>
+            <h3 className="text-sm font-semibold text-slate-500">
+              Active Tasks
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-[#F97316]">
+              {counters.tasks}
+            </p>
           </div>
           <div className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-2 hover:shadow-lg">
-            <h3 className="text-sm font-semibold text-slate-500">Meals Delivered</h3>
-            <p className="mt-2 text-3xl font-bold text-[#16A34A]">{counters.meals}</p>
+            <h3 className="text-sm font-semibold text-slate-500">
+              Meals Delivered
+            </h3>
+            <p className="mt-2 text-3xl font-bold text-[#16A34A]">
+              {counters.meals}
+            </p>
           </div>
         </div>
 
         <section className="mb-8">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold">Available Tasks</h2>
-            <p className="text-sm text-slate-500">Swipe or tap to accept a task</p>
+            <p className="text-sm text-slate-500">
+              Swipe or tap to accept a task
+            </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {candidateTasks.map((task) => (
-              <article key={task.id} className="rounded-2xl border border-transparent bg-white p-5 shadow-sm transition hover:shadow-xl hover:-translate-y-2 hover:border-gradient-to-r hover:border-[#16A34A]" style={{ borderImage: 'linear-gradient(90deg, #16A34A, #F97316) 1' }}>
+              <article
+                key={task.id}
+                className="rounded-2xl border border-transparent bg-white p-5 shadow-sm transition hover:shadow-xl hover:-translate-y-2 hover:border-gradient-to-r hover:border-[#16A34A]"
+                style={{
+                  borderImage: "linear-gradient(90deg, #16A34A, #F97316) 1",
+                }}
+              >
                 <h3 className="text-lg font-semibold">{task.food}</h3>
-                <p className="text-xs text-slate-500">{task.restaurant} • {task.quantity}</p>
-                <p className="mt-2 text-sm text-slate-600">Distance: {task.distance}</p>
+                <p className="text-xs text-slate-500">
+                  {task.restaurant} • {task.quantity}
+                </p>
+                <p className="mt-2 text-sm text-slate-600">
+                  Distance: {task.distance}
+                </p>
                 <p className="text-sm text-slate-600">Pickup: {task.pickup}</p>
-                <button className="mt-4 rounded-xl bg-[#F97316] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ea580c] active:scale-95" onClick={() => acceptTask(task)}>
+                <button
+                  type="button"
+                  className="mt-4 rounded-xl bg-[#F97316] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ea580c] active:scale-95"
+                  onClick={() => acceptTask(task)}
+                >
                   Accept Task
                 </button>
               </article>
@@ -751,30 +1507,44 @@ function NGODashboard({ onBack }) {
 
         {activeTask && (
           <section className="mb-8 rounded-2xl bg-[#16A34A] bg-opacity-10 p-6 shadow-lg">
-            <h3 className="mb-2 text-xl font-bold text-[#065f46]">Active Task</h3>
-            <p className="text-sm text-slate-700">{activeTask.food} at {activeTask.restaurant}</p>
-            <p className="text-sm text-slate-700">NGO Delivery Location: {activeTask.restaurant} Community Center</p>
-            <p className="mt-2 text-sm text-slate-700">Contact: +91-9876543210</p>
+            <h3 className="mb-2 text-xl font-bold text-[#065f46]">
+              Active Task
+            </h3>
+            <p className="text-sm text-slate-700">
+              {activeTask.food} at {activeTask.restaurant}
+            </p>
+            <p className="text-sm text-slate-700">
+              NGO Delivery Location: {activeTask.restaurant} Community Center
+            </p>
+            <p className="mt-2 text-sm text-slate-700">
+              Contact: +91-9876543210
+            </p>
 
             <div className="mt-4 space-y-3 rounded-xl bg-white p-4 text-sm text-slate-700 shadow-sm">
               <h4 className="font-semibold">Assign Volunteer</h4>
               <div className="grid gap-3 md:grid-cols-2">
                 <input
                   value={volunteer.name}
-                  onChange={(e) => setVolunteer((v) => ({ ...v, name: e.target.value }))}
+                  onChange={(e) =>
+                    setVolunteer((v) => ({ ...v, name: e.target.value }))
+                  }
                   placeholder="Volunteer Name"
                   className="rounded-lg border border-slate-200 px-3 py-2"
                 />
                 <input
                   value={volunteer.phone}
-                  onChange={(e) => setVolunteer((v) => ({ ...v, phone: e.target.value }))}
+                  onChange={(e) =>
+                    setVolunteer((v) => ({ ...v, phone: e.target.value }))
+                  }
                   placeholder="Phone Number"
                   className="rounded-lg border border-slate-200 px-3 py-2"
                 />
               </div>
               <textarea
                 value={volunteer.notes}
-                onChange={(e) => setVolunteer((v) => ({ ...v, notes: e.target.value }))}
+                onChange={(e) =>
+                  setVolunteer((v) => ({ ...v, notes: e.target.value }))
+                }
                 placeholder="Notes (optional)"
                 className="w-full rounded-lg border border-slate-200 px-3 py-2"
                 rows={3}
@@ -788,17 +1558,33 @@ function NGODashboard({ onBack }) {
               </button>
               {activeTask.assignedVolunteer && (
                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-slate-600">
-                  Assigned: {activeTask.assignedVolunteer.name} • {activeTask.assignedVolunteer.phone}
+                  Assigned: {activeTask.assignedVolunteer.name} •{" "}
+                  {activeTask.assignedVolunteer.phone}
                 </div>
               )}
             </div>
 
             <div className="mb-4 mt-4 h-2 rounded-full bg-slate-200">
-              <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-orange-500" style={{ width: `${progress}%`, transition: 'width 0.3s ease' }} />
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-orange-500"
+                style={{ width: `${progress}%`, transition: "width 0.3s ease" }}
+              />
             </div>
             <div className="flex gap-3">
-              <button className="rounded-lg bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#15803d]" onClick={pickupTask}>Mark as Picked Up</button>
-              <button className="rounded-lg bg-[#F97316] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ea580c]" onClick={deliverTask}>Mark as Delivered</button>
+              <button
+                type="button"
+                className="rounded-lg bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#15803d]"
+                onClick={pickupTask}
+              >
+                Mark as Picked Up
+              </button>
+              <button
+                type="button"
+                className="rounded-lg bg-[#F97316] px-4 py-2 text-sm font-semibold text-white hover:bg-[#ea580c]"
+                onClick={deliverTask}
+              >
+                Mark as Delivered
+              </button>
             </div>
           </section>
         )}
@@ -820,13 +1606,25 @@ function NGODashboard({ onBack }) {
             <h4 className="text-lg font-semibold">Task History</h4>
             <div className="mt-3 space-y-3">
               {history.length === 0 ? (
-                <p className="text-sm text-slate-500">No completed tasks yet.</p>
-              ) : history.map((item, i) => (
-                <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700" style={{ animation: `fadeInUp 0.4s ease ${i * 0.1}s both` }}>
-                  <div className="font-semibold text-slate-900">{item.food}</div>
-                  <div>{item.date} • {item.status}</div>
-                </div>
-              ))}
+                <p className="text-sm text-slate-500">
+                  No completed tasks yet.
+                </p>
+              ) : (
+                history.map((item, i) => (
+                  <div
+                    key={`${item.food}-${item.date}-${i}`}
+                    className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700"
+                    style={{ animation: `fadeInUp 0.4s ease ${i * 0.1}s both` }}
+                  >
+                    <div className="font-semibold text-slate-900">
+                      {item.food}
+                    </div>
+                    <div>
+                      {item.date} • {item.status}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -853,99 +1651,103 @@ function NGODashboard({ onBack }) {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
 export default function LandingPage() {
-
-  const [page, setPage] = useState('landing')
-  const heroVideoRef = useRef(null)
-  const aboutRef = useRef(null)
+  const [page, setPage] = useState("landing");
+  const heroVideoRef = useRef(null);
+  const aboutRef = useRef(null);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
-      return localStorage.getItem('auth') === '1'
+      return localStorage.getItem("auth") === "1";
     } catch {
-      return false
+      return false;
     }
-  })
+  });
 
   const scrollToAbout = () => {
-    setPage('landing')
-    aboutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-  const [postLoginTarget, setPostLoginTarget] = useState(null)
+    setPage("landing");
+    aboutRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const [postLoginTarget, setPostLoginTarget] = useState(null);
 
   const goToDonate = () => {
     if (isAuthenticated) {
-      setPage('donate')
-      return
+      setPage("donate");
+      return;
     }
-    setPostLoginTarget('donate')
-    setPage('login')
-  }
+    setPostLoginTarget("donate");
+    setPage("login");
+  };
 
   const handleLoginSuccess = () => {
-    setIsAuthenticated(true)
+    setIsAuthenticated(true);
     try {
-      localStorage.setItem('auth', '1')
+      localStorage.setItem("auth", "1");
     } catch {
       // ignore storage errors (private mode, etc.)
     }
-    const target = postLoginTarget || 'landing'
-    setPostLoginTarget(null)
-    setPage(target)
-  }
+    const target = postLoginTarget || "landing";
+    setPostLoginTarget(null);
+    setPage(target);
+  };
 
   useEffect(() => {
-    const video = heroVideoRef.current
-    if (!video) return
+    const video = heroVideoRef.current;
+    if (!video) return;
 
     const ensurePlaying = async () => {
-      if (document.hidden) return
-      if (video.readyState < 2) return
-      if (!video.paused) return
+      if (document.hidden) return;
+      if (video.readyState < 2) return;
+      if (!video.paused) return;
 
       try {
-        await video.play()
+        await video.play();
       } catch {
         // Autoplay can still be blocked in some browsers; we retry on future events/interval.
       }
-    }
+    };
 
     const onVisibilityChange = () => {
-      if (!document.hidden) ensurePlaying()
-    }
+      if (!document.hidden) ensurePlaying();
+    };
 
-    ensurePlaying()
+    ensurePlaying();
 
-    video.addEventListener('pause', ensurePlaying)
-    video.addEventListener('ended', ensurePlaying)
-    video.addEventListener('stalled', ensurePlaying)
-    video.addEventListener('waiting', ensurePlaying)
-    document.addEventListener('visibilitychange', onVisibilityChange)
+    video.addEventListener("pause", ensurePlaying);
+    video.addEventListener("ended", ensurePlaying);
+    video.addEventListener("stalled", ensurePlaying);
+    video.addEventListener("waiting", ensurePlaying);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
-    const interval = window.setInterval(ensurePlaying, 2000)
+    const interval = window.setInterval(ensurePlaying, 2000);
 
     return () => {
-      window.clearInterval(interval)
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-      video.removeEventListener('pause', ensurePlaying)
-      video.removeEventListener('ended', ensurePlaying)
-      video.removeEventListener('stalled', ensurePlaying)
-      video.removeEventListener('waiting', ensurePlaying)
-    }
-  }, [])
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      video.removeEventListener("pause", ensurePlaying);
+      video.removeEventListener("ended", ensurePlaying);
+      video.removeEventListener("stalled", ensurePlaying);
+      video.removeEventListener("waiting", ensurePlaying);
+    };
+  }, []);
 
-  if (page === 'login') {
-    return <LoginPage onBack={() => setPage('landing')} onLoginSuccess={handleLoginSuccess} />
+  if (page === "login") {
+    return (
+      <LoginPage
+        onBack={() => setPage("landing")}
+        onLoginSuccess={handleLoginSuccess}
+      />
+    );
   }
 
-  if (page === 'donate') {
-    return <DonatePage onBack={() => setPage('landing')} />
+  if (page === "donate") {
+    return <DonatePage onBack={() => setPage("landing")} />;
   }
 
-  if (page === 'ngo') {
-    return <NGODashboard onBack={() => setPage('landing')} />
+  if (page === "ngo") {
+    return <NGODashboard onBack={() => setPage("landing")} />;
   }
 
   return (
@@ -955,13 +1757,20 @@ export default function LandingPage() {
           <div className="text-lg font-semibold tracking-tight">
             <span className="text-slate-900">Ann</span>
             <span className="text-emerald-600">Seva</span>
-            
-          </div> 
+          </div>
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
-            <button type="button" onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">
+            <button
+              type="button"
+              onClick={() => setPage("landing")}
+              className="text-slate-700 hover:text-emerald-600"
+            >
               Home
             </button>
-            <button type="button" onClick={scrollToAbout} className="text-slate-700 hover:text-emerald-600">
+            <button
+              type="button"
+              onClick={scrollToAbout}
+              className="text-slate-700 hover:text-emerald-600"
+            >
               About Us
             </button>
             <button
@@ -973,7 +1782,7 @@ export default function LandingPage() {
             </button>
             <button
               type="button"
-              onClick={() => setPage('login')}
+              onClick={() => setPage("login")}
               className="rounded-full border border-slate-200 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
             >
               Login / Sign up
@@ -1015,8 +1824,8 @@ export default function LandingPage() {
                 Children are the future of a thriving India.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
-                We connect meals, support, and community to ensure no one goes hungry.
-                Explore how you can make an impact in your neighborhood.
+                We connect meals, support, and community to ensure no one goes
+                hungry. Explore how you can make an impact in your neighborhood.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
                 <button
@@ -1028,19 +1837,22 @@ export default function LandingPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPage('login')}
+                  onClick={() => setPage("login")}
                   className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
                 >
                   Login / Sign up
                 </button>
               </div>
             </div>
-
           </div>
         </div>
       </main>
 
-      <AboutSection ref={aboutRef} onDonate={goToDonate} onPartnerNGO={() => setPage('ngo')} />
+      <AboutSection
+        ref={aboutRef}
+        onDonate={goToDonate}
+        onPartnerNGO={() => setPage("ngo")}
+      />
     </div>
-  )
+  );
 }
