@@ -1,9 +1,27 @@
-import { useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import searchLogo from './img/search.png'
 import githubLogo from './img/github (1).png'
 import gettyVideo from './img/gettyimages-451083741-640_adpp.mp4'
 
-function LoginPage({ onBack }) {
+function LoginPage({ onBack, onLoginSuccess }) {
+  const [emailOrUsername, setEmailOrUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const emailOrUsernameId = useId()
+  const passwordId = useId()
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setError('')
+
+    if (!emailOrUsername.trim() || !password.trim()) {
+      setError('Please enter your email/username and password.')
+      return
+    }
+
+    onLoginSuccess?.()
+  }
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto flex h-full max-w-6xl flex-col justify-center px-4 py-16 sm:px-6 lg:flex-row lg:px-8">
@@ -24,11 +42,17 @@ function LoginPage({ onBack }) {
             </div>
 
             <div className="space-y-3">
-              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100">
+              <button
+                type="button"
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100"
+              >
                 <img src={searchLogo} alt="Google" className="h-5 w-5" />
                 Log in with Google
               </button>
-              <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100">
+              <button
+                type="button"
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100"
+              >
                 <img src={githubLogo} alt="GitHub" className="h-5 w-5" />
                 Log in with GitHub
               </button>
@@ -43,21 +67,37 @@ function LoginPage({ onBack }) {
               </div>
             </div>
 
-            <form className="space-y-4">
+            {error && (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+                {error}
+              </div>
+            )}
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="text-xs font-semibold text-slate-700">Email or username</label>
+                <label htmlFor={emailOrUsernameId} className="text-xs font-semibold text-slate-700">
+                  Email or username
+                </label>
                 <input
+                  id={emailOrUsernameId}
                   type="text"
                   className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
                   placeholder="you@example.com"
+                  value={emailOrUsername}
+                  onChange={(e) => setEmailOrUsername(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-700">Password</label>
+                <label htmlFor={passwordId} className="text-xs font-semibold text-slate-700">
+                  Password
+                </label>
                 <input
+                  id={passwordId}
                   type="password"
                   className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
 
@@ -66,9 +106,9 @@ function LoginPage({ onBack }) {
                   <input type="checkbox" className="h-4 w-4 rounded border-slate-300 bg-white text-cyan-600 focus:ring-cyan-500" />
                   Keep me signed in
                 </label>
-                <a href="#" className="font-medium text-cyan-600 hover:text-cyan-500">
+                <button type="button" className="font-medium text-cyan-600 hover:text-cyan-500">
                   Forgot password
-                </a>
+                </button>
               </div>
 
               <button
@@ -81,9 +121,9 @@ function LoginPage({ onBack }) {
 
             <div className="text-center text-xs text-slate-500">
               Don’t have an account?{' '}
-              <a href="#" className="font-medium text-cyan-600 hover:text-cyan-500">
+              <button type="button" className="font-medium text-cyan-600 hover:text-cyan-500">
                 Create an account
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -176,7 +216,11 @@ function DonatePage({ onBack }) {
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-lime-50 to-pink-50 text-slate-900">
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-4 flex items-center justify-between">
-          <button onClick={onBack} className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-cyan-700 shadow-sm hover:bg-cyan-50">
+          <button
+            type="button"
+            onClick={onBack}
+            className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-cyan-700 shadow-sm hover:bg-cyan-50"
+          >
             ← Back
           </button>
           <h2 className="text-2xl font-bold">Donate Now Page</h2>
@@ -335,9 +379,79 @@ function DonatePage({ onBack }) {
 
 export default function LandingPage() {
   const [page, setPage] = useState('landing')
+  const heroVideoRef = useRef(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return localStorage.getItem('auth') === '1'
+    } catch {
+      return false
+    }
+  })
+  const [postLoginTarget, setPostLoginTarget] = useState(null)
+
+  const goToDonate = () => {
+    if (isAuthenticated) {
+      setPage('donate')
+      return
+    }
+    setPostLoginTarget('donate')
+    setPage('login')
+  }
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+    try {
+      localStorage.setItem('auth', '1')
+    } catch {
+      // ignore storage errors (private mode, etc.)
+    }
+    const target = postLoginTarget || 'landing'
+    setPostLoginTarget(null)
+    setPage(target)
+  }
+
+  useEffect(() => {
+    const video = heroVideoRef.current
+    if (!video) return
+
+    const ensurePlaying = async () => {
+      if (document.hidden) return
+      if (video.readyState < 2) return
+      if (!video.paused) return
+
+      try {
+        await video.play()
+      } catch {
+        // Autoplay can still be blocked in some browsers; we retry on future events/interval.
+      }
+    }
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) ensurePlaying()
+    }
+
+    ensurePlaying()
+
+    video.addEventListener('pause', ensurePlaying)
+    video.addEventListener('ended', ensurePlaying)
+    video.addEventListener('stalled', ensurePlaying)
+    video.addEventListener('waiting', ensurePlaying)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    const interval = window.setInterval(ensurePlaying, 2000)
+
+    return () => {
+      window.clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      video.removeEventListener('pause', ensurePlaying)
+      video.removeEventListener('ended', ensurePlaying)
+      video.removeEventListener('stalled', ensurePlaying)
+      video.removeEventListener('waiting', ensurePlaying)
+    }
+  }, [])
 
   if (page === 'login') {
-    return <LoginPage onBack={() => setPage('landing')} />
+    return <LoginPage onBack={() => setPage('landing')} onLoginSuccess={handleLoginSuccess} />
   }
 
   if (page === 'donate') {
@@ -354,10 +468,15 @@ export default function LandingPage() {
             <span className="text-slate-900">simple</span>
           </div> 
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
-            <button onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">Home</button>
-            <button onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">About Us</button>
+            <button type="button" onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">
+              Home
+            </button>
+            <button type="button" onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">
+              About Us
+            </button>
             <button
-              onClick={() => setPage('donate')}
+              type="button"
+              onClick={goToDonate}
               className="rounded-full bg-rose-500 px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-rose-500/30 hover:bg-rose-400"
             >
               Donate now
@@ -370,7 +489,10 @@ export default function LandingPage() {
               Login / Sign up
             </button>
           </nav>
-          <button className="md:hidden rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200">
+          <button
+            type="button"
+            className="md:hidden rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+          >
             Menu
           </button>
         </div>
@@ -390,7 +512,15 @@ export default function LandingPage() {
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-6">
           <div className="grid w-full gap-10 lg:grid-cols-2">
             <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/70 shadow-lg">
-              <video controls loop muted className="h-full min-h-[320px] w-full object-cover">
+              <video
+                ref={heroVideoRef}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className="h-full min-h-[320px] w-full object-cover"
+              >
                 <source src={gettyVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -405,12 +535,6 @@ export default function LandingPage() {
                 Explore how you can make an impact in your neighborhood.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
-                <button
-                  onClick={() => setPage('donate')}
-                  className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500"
-                >
-                  Donate Now
-                </button>
                 <a
                   href="#learn"
                   className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
