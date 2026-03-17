@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.log
+
+# Env files (never commit secrets)
+.env
+.env.*
+!.env.example
+server/.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
