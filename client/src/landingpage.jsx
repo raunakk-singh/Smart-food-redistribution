@@ -546,7 +546,7 @@ function AboutPage({ onBack, onJoin }) {
   )
 }
 
-const AboutSection = forwardRef(({ onDonate, onVolunteer }, ref) => (
+const AboutSection = forwardRef(({ onDonate, onPartnerNGO }, ref) => (
   <div ref={ref} className="bg-gradient-to-b from-white via-slate-50 to-white text-slate-900">
     <section className="py-20">
       <div className="mx-auto max-w-7xl px-6">
@@ -555,31 +555,28 @@ const AboutSection = forwardRef(({ onDonate, onVolunteer }, ref) => (
           Our platform empowers communities by reducing food waste and supporting those in need. You can contribute in multiple ways.
         </p>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {[
             {
               icon: '💰',
-              title: 'Join the Funding',
-              description: 'Support our mission by contributing a small monthly amount. Even the cost of one meal can help feed someone in need.',
-              label: 'Subscribe Now',
+              title: 'Support the Cause',
+              description: 'Contribute to reducing food waste and helping communities by supporting our mission.',
+              label: 'Support Now',
+              action: 'donate',
             },
             {
               icon: '🍛',
-              title: 'Donate Food / Support Initiatives',
-              description: 'Help redistribute surplus food from restaurants to people in need and reduce food waste in your community.',
+              title: 'Donate Food',
+              description: 'Restaurants and individuals can donate surplus food to ensure it reaches those in need.',
               label: 'Donate Now',
-            },
-            {
-              icon: '⚡',
-              title: 'Support Sustainability',
-              description: 'Contribute to initiatives that promote sustainable solutions and community development.',
-              label: 'Contribute',
+              action: 'donate',
             },
             {
               icon: '🤝',
-              title: 'Share Your Skills (Volunteer)',
-              description: 'Join as a volunteer and help deliver food or support the platform with your skills.',
-              label: 'Become a Volunteer',
+              title: 'Partner as NGO',
+              description: 'Join as an NGO to collect, manage, and distribute food efficiently using our platform.',
+              label: 'Join as NGO',
+              action: 'ngo',
             },
           ].map((card, index) => (
             <article
@@ -593,13 +590,13 @@ const AboutSection = forwardRef(({ onDonate, onVolunteer }, ref) => (
               <button
                 type="button"
                 onClick={() => {
-                  if (card.label === 'Become a Volunteer') {
-                    onVolunteer?.()
+                  if (card.action === 'ngo') {
+                    onPartnerNGO?.()
                   } else {
                     onDonate?.()
                   }
                 }}
-                className="mt-5 inline-flex items-center rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-transform duration-150 hover:bg-emerald-500 active:scale-95"
+                className="mt-5 inline-flex items-center rounded-full bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white transition-transform duration-150 hover:bg-[#15803d] active:scale-95"
               >
                 {card.label}
               </button>
@@ -655,7 +652,7 @@ const AboutSection = forwardRef(({ onDonate, onVolunteer }, ref) => (
   </div>
 ))
 
-function VolunteerPage({ onBack }) {
+function NGODashboard({ onBack }) {
   const [counters] = useState({ deliveries: 115, tasks: 8, meals: 875 })
   const [activeTask, setActiveTask] = useState(null)
   const [candidateTasks, setCandidateTasks] = useState([
@@ -668,10 +665,18 @@ function VolunteerPage({ onBack }) {
     'New priority task near your location',
     'Task completed by Reena, 20 min ago',
   ])
+  const [volunteer, setVolunteer] = useState({ name: '', phone: '', notes: '' })
 
   const acceptTask = (task) => {
     setActiveTask({ ...task, status: 'ready' })
     setCandidateTasks((prev) => prev.filter((t) => t.id !== task.id))
+  }
+
+  const assignVolunteer = () => {
+    if (!activeTask) return
+    setActiveTask((task) => ({ ...task, assignedVolunteer: volunteer }))
+    setNotifications((prev) => [...prev, `Volunteer ${volunteer.name} assigned to task ${activeTask?.id}`])
+    setVolunteer({ name: '', phone: '', notes: '' })
   }
 
   const pickupTask = () => {
@@ -695,10 +700,10 @@ function VolunteerPage({ onBack }) {
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-lg">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-2xl bg-[#16A34A]/20 text-[#16A34A] flex items-center justify-center font-bold">SF</div>
+            <div className="h-9 w-9 rounded-2xl bg-[#16A34A]/20 text-[#16A34A] flex items-center justify-center font-bold">NGO</div>
             <div>
-              <h1 className="text-lg font-bold">Volunteer Dashboard</h1>
-              <p className="text-xs text-slate-500">Delivery-ready status active</p>
+              <h1 className="text-lg font-bold">NGO Delivery Dashboard</h1>
+              <p className="text-xs text-slate-500">Manage requests, assign volunteers, and track deliveries</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -750,6 +755,44 @@ function VolunteerPage({ onBack }) {
             <p className="text-sm text-slate-700">{activeTask.food} at {activeTask.restaurant}</p>
             <p className="text-sm text-slate-700">NGO Delivery Location: {activeTask.restaurant} Community Center</p>
             <p className="mt-2 text-sm text-slate-700">Contact: +91-9876543210</p>
+
+            <div className="mt-4 space-y-3 rounded-xl bg-white p-4 text-sm text-slate-700 shadow-sm">
+              <h4 className="font-semibold">Assign Volunteer</h4>
+              <div className="grid gap-3 md:grid-cols-2">
+                <input
+                  value={volunteer.name}
+                  onChange={(e) => setVolunteer((v) => ({ ...v, name: e.target.value }))}
+                  placeholder="Volunteer Name"
+                  className="rounded-lg border border-slate-200 px-3 py-2"
+                />
+                <input
+                  value={volunteer.phone}
+                  onChange={(e) => setVolunteer((v) => ({ ...v, phone: e.target.value }))}
+                  placeholder="Phone Number"
+                  className="rounded-lg border border-slate-200 px-3 py-2"
+                />
+              </div>
+              <textarea
+                value={volunteer.notes}
+                onChange={(e) => setVolunteer((v) => ({ ...v, notes: e.target.value }))}
+                placeholder="Notes (optional)"
+                className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                rows={3}
+              />
+              <button
+                type="button"
+                className="rounded-lg bg-[#16A34A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#15803d] active:scale-95"
+                onClick={assignVolunteer}
+              >
+                Assign Volunteer
+              </button>
+              {activeTask.assignedVolunteer && (
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-slate-600">
+                  Assigned: {activeTask.assignedVolunteer.name} • {activeTask.assignedVolunteer.phone}
+                </div>
+              )}
+            </div>
+
             <div className="mb-4 mt-4 h-2 rounded-full bg-slate-200">
               <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-orange-500" style={{ width: `${progress}%`, transition: 'width 0.3s ease' }} />
             </div>
@@ -901,8 +944,8 @@ export default function LandingPage() {
     return <DonatePage onBack={() => setPage('landing')} />
   }
 
-  if (page === 'volunteer') {
-    return <VolunteerPage onBack={() => setPage('landing')} />
+  if (page === 'ngo') {
+    return <NGODashboard onBack={() => setPage('landing')} />
   }
 
   return (
@@ -997,7 +1040,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <AboutSection ref={aboutRef} onDonate={goToDonate} onVolunteer={() => setPage('volunteer')} />
+      <AboutSection ref={aboutRef} onDonate={goToDonate} onPartnerNGO={() => setPage('ngo')} />
     </div>
   )
 }
