@@ -23,10 +23,19 @@ function LoginPage({ onBack, onLoginSuccess }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <div className="mx-auto flex h-full max-w-6xl flex-col justify-center px-4 py-16 sm:px-6 lg:flex-row lg:px-8">
+    <div className="relative min-h-screen overflow-hidden text-slate-900">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+        src={gettyVideo}
+      />
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-4 py-16 sm:px-6 lg:flex-row lg:px-8">
         <div className="mx-auto w-full max-w-md lg:mx-0 lg:flex-1">
-          <div className="space-y-6 rounded-3xl bg-white p-10 shadow-xl ring-1 ring-slate-200">
+          <div className="space-y-6 rounded-3xl bg-white/85 p-10 shadow-xl ring-1 ring-slate-200 backdrop-blur-xl">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight text-slate-900">Welcome back</h1>
@@ -377,9 +386,170 @@ function DonatePage({ onBack }) {
   )
 }
 
+function AboutPage({ onBack, onJoin }) {
+  return (
+    <div className="min-h-screen bg-white text-slate-900">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div className="text-lg font-bold text-emerald-700">Smart Food Redistribution</div>
+          <button
+            onClick={onBack}
+            className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+          >
+            Back
+          </button>
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+          <div>
+            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
+              Reducing Food Waste, Feeding Lives
+            </h1>
+            <p className="mt-6 max-w-xl text-lg text-slate-600">
+              Connecting restaurants, NGOs, and volunteers to redistribute surplus food efficiently.
+            </p>
+            <button
+              onClick={onJoin}
+              className="mt-8 rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow hover:bg-emerald-500"
+            >
+              Donate Now
+            </button>
+          </div>
+          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-4">
+            <div className="flex h-64 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 via-white to-cyan-100">
+              <span className="text-xl font-semibold text-slate-600">🤝 Community donation illustration</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-slate-100 bg-slate-50 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-2xl font-bold text-slate-900">About the Platform</h2>
+          <p className="mt-4 max-w-3xl text-slate-600">
+            We empower food donors, NGOs, and volunteers to coordinate in real-time, ensuring surplus meals are diverted from waste to relief.
+          </p>
+          <p className="mt-3 max-w-3xl text-slate-600">
+            Donors share available food, NGOs schedule pickups, and volunteers complete deliveries, creating a seamless redistribution chain.
+          </p>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-2xl font-bold text-slate-900">Mission & Vision</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-6">
+              <h3 className="text-xl font-semibold text-emerald-700">Mission</h3>
+              <p className="mt-2 text-slate-700">To reduce food waste and ensure that surplus food reaches those in need.</p>
+            </div>
+            <div className="rounded-2xl border border-cyan-100 bg-cyan-50 p-6">
+              <h3 className="text-xl font-semibold text-cyan-700">Vision</h3>
+              <p className="mt-2 text-slate-700">To build a sustainable and hunger-free community using technology.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-slate-100 bg-slate-50 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-2xl font-bold text-slate-900">How It Works</h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+              <div className="mb-3 text-2xl">🍽️</div>
+              <h3 className="font-semibold">1. Restaurants upload food</h3>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+              <div className="mb-3 text-2xl">📩</div>
+              <h3 className="font-semibold">2. NGOs receive alerts</h3>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+              <div className="mb-3 text-2xl">🚚</div>
+              <h3 className="font-semibold">3. Volunteers deliver</h3>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+              <div className="mb-3 text-2xl">🤲</div>
+              <h3 className="font-semibold">4. People are fed</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-2xl font-bold text-slate-900">Impact</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <p className="text-3xl font-bold text-emerald-600">10k+</p>
+              <p className="text-sm text-slate-600">Meals Saved</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <p className="text-3xl font-bold text-emerald-600">5k+</p>
+              <p className="text-sm text-slate-600">Food Donations</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <p className="text-3xl font-bold text-emerald-600">1.8k+</p>
+              <p className="text-sm text-slate-600">Active Volunteers</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-center">
+              <p className="text-3xl font-bold text-emerald-600">250+</p>
+              <p className="text-sm text-slate-600">NGOs Connected</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-slate-100 bg-slate-50 py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-2xl font-bold text-slate-900">Why Choose Us</h2>
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            <li className="rounded-lg bg-white p-4 shadow-sm">Real-time food redistribution</li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">Easy-to-use platform</li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">Social impact driven</li>
+            <li className="rounded-lg bg-white p-4 shadow-sm">Scalable and efficient system</li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="text-2xl font-bold text-slate-900">Meet the Team</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {['Aanya - Founder', 'Rohan - CTO', 'Mira - Ops Lead', 'Arjun - Community'].map((member) => (
+              <div key={member} className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+                <div className="mx-auto mb-3 h-16 w-16 rounded-full bg-emerald-100 text-2xl leading-[64px]">👤</div>
+                <p className="font-semibold text-slate-800">{member.split(' - ')[0]}</p>
+                <p className="text-sm text-slate-500">{member.split(' - ')[1]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-slate-200 bg-slate-100 py-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 text-sm text-slate-700 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="font-semibold">Contact</p>
+            <p>support@smartfoodredistribution.org | +91 98765 43210</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <a href="#" className="text-slate-700 hover:text-emerald-600">Twitter</a>
+            <a href="#" className="text-slate-700 hover:text-emerald-600">LinkedIn</a>
+            <a href="#" className="text-slate-700 hover:text-emerald-600">Instagram</a>
+          </div>
+          <div>&copy; {new Date().getFullYear()} Smart Food Redistribution. All rights reserved.</div>
+        </div>
+      </footer>
+    </div>
+  )
+}
+
 export default function LandingPage() {
   const [page, setPage] = useState('landing')
   const heroVideoRef = useRef(null)
+  const aboutRef = useRef(null)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
       return localStorage.getItem('auth') === '1'
@@ -387,6 +557,11 @@ export default function LandingPage() {
       return false
     }
   })
+
+  const scrollToAbout = () => {
+    setPage('landing')
+    aboutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
   const [postLoginTarget, setPostLoginTarget] = useState(null)
 
   const goToDonate = () => {
@@ -471,7 +646,7 @@ export default function LandingPage() {
             <button type="button" onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">
               Home
             </button>
-            <button type="button" onClick={() => setPage('landing')} className="text-slate-700 hover:text-emerald-600">
+            <button type="button" onClick={scrollToAbout} className="text-slate-700 hover:text-emerald-600">
               About Us
             </button>
             <button
@@ -498,54 +673,92 @@ export default function LandingPage() {
         </div>
       </header>
 
-      <main className="relative h-screen">
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-purple-200 via-purple-100 to-indigo-100"
-          aria-hidden="true"
-        />
+      <main className="relative h-screen overflow-hidden">
+        <video
+          ref={heroVideoRef}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src={gettyVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
         <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-20 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-purple-200 opacity-40 blur-3xl" />
-          <div className="absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-pink-200 opacity-40 blur-3xl" />
+          <div className="absolute -top-20 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-purple-200 opacity-20 blur-3xl" />
+          <div className="absolute -bottom-24 right-1/4 h-96 w-96 rounded-full bg-pink-200 opacity-20 blur-3xl" />
         </div>
-        <div className="absolute inset-0 bg-white/70" aria-hidden="true" />
 
-        <div className="relative mx-auto flex h-full max-w-7xl items-center px-6">
+        <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-6">
           <div className="grid w-full gap-10 lg:grid-cols-2">
-            <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/70 shadow-lg">
-              <video
-                ref={heroVideoRef}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                className="h-full min-h-[320px] w-full object-cover"
-              >
-                <source src={gettyVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center text-white">
               <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
                 Children are the future of a thriving India.
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-700">
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/90">
                 We connect meals, support, and community to ensure no one goes hungry.
                 Explore how you can make an impact in your neighborhood.
               </p>
               <div className="mt-10 flex flex-wrap gap-4">
-                <a
-                  href="#learn"
-                  className="inline-flex items-center justify-center rounded-full border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                <button
+                  type="button"
+                  onClick={goToDonate}
+                  className="inline-flex items-center justify-center rounded-full bg-rose-500 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-rose-500/40 hover:bg-rose-400"
                 >
-                  Learn More
-                </a>
+                  Donate Now
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPage('login')}
+                  className="inline-flex items-center justify-center rounded-full border border-white/50 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
+                >
+                  Login / Sign up
+                </button>
               </div>
             </div>
+
           </div>
         </div>
       </main>
+
+      <section ref={aboutRef} className="bg-white py-20 text-slate-900">
+        <div className="mx-auto max-w-7xl px-6">
+          <h2 className="text-4xl font-bold tracking-tight text-slate-900">About Us</h2>
+          <p className="mt-5 max-w-3xl text-lg text-slate-600">
+            We connect restaurants, NGOs, and volunteers for smart food redistribution. Surplus food is quickly assigned to nearby partners and delivered to people in need.
+          </p>
+
+          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <h3 className="font-semibold text-slate-900">Mission</h3>
+              <p className="mt-2 text-slate-600">To reduce food waste and ensure surplus food reaches those in need.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <h3 className="font-semibold text-slate-900">Vision</h3>
+              <p className="mt-2 text-slate-600">To build a sustainable, hunger-free community using technology.</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <h3 className="font-semibold text-slate-900">How it Works</h3>
+              <ol className="mt-2 list-decimal space-y-1 pl-5 text-slate-600">
+                <li>Restaurants upload food</li>
+                <li>NGOs receive requests</li>
+                <li>Volunteers pickup and deliver</li>
+                <li>Food reaches people in need</li>
+              </ol>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <h3 className="font-semibold text-slate-900">Impact</h3>
+              <p className="mt-2 text-slate-600">Track meals saved, volunteers active, donations shared, and NGOs connected.</p>
+            </div>
+          </div>
+
+          
+        </div>
+      </section>
     </div>
   )
 }
